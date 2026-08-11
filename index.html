@@ -120,13 +120,77 @@
             </div>
           </div>
 
+          <div class="theme-customizer">
+            <div class="section-title">🎯 تنظیمات تم فعلی</div>
+            <div class="muted">رنگ‌ها و فونت‌های تم فعلی را مخصوص‌سازی کن</div>
+            
+            <div class="customizer-group" style="margin-top:12px">
+              <div class="color-input-wrapper">
+                <input type="color" id="headerGradColor" title="رنگ گرادیان هدر">
+                <label>
+                  <span>رنگ هدر</span>
+                  <span id="headerGradColorText">#101d30</span>
+                </label>
+              </div>
+              <div class="color-input-wrapper">
+                <input type="color" id="accentColor" title="رنگ تاکید">
+                <label>
+                  <span>رنگ تاکید</span>
+                  <span id="accentColorText">#c99b4a</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="customizer-group">
+              <div class="color-input-wrapper">
+                <input type="color" id="blockBgColor" title="رنگ بلاک‌ها">
+                <label>
+                  <span>رنگ بلاک‌ها</span>
+                  <span id="blockBgColorText">#1b2c44</span>
+                </label>
+              </div>
+              <div class="color-input-wrapper">
+                <input type="color" id="accentLightColor" title="رنگ روشن تاکید">
+                <label>
+                  <span>رنگ روشن</span>
+                  <span id="accentLightColorText">#e5c37d</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="customizer-group full">
+              <div class="color-input-wrapper">
+                <input type="color" id="headerTextColor" title="رنگ متن هدر">
+                <label>
+                  <span>رنگ متن هدر</span>
+                  <span id="headerTextColorText">#ffffff</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="customizer-group full">
+              <div class="color-input-wrapper">
+                <input type="color" id="headerTextSecondaryColor" title="رنگ متن فرعی هدر">
+                <label>
+                  <span>رنگ متن فرعی هدر</span>
+                  <span id="headerTextSecondaryColorText">#b9c6d7</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="customizer-buttons">
+              <button class="btn-save" id="saveThemeBtn">💾 ذخیره تم</button>
+              <button class="btn-reset" id="resetThemeBtn">🔄 بازنشانی</button>
+            </div>
+          </div>
+
           <div class="section-title" style="margin-top:24px">پس‌زمینه شخصی</div>
           <label class="field">
             <span>آپلود تصویر پس‌زمینه</span>
             <input type="file" id="bgImageUpload" accept="image/*">
           </label>
           <button class="btn small secondary" id="clearBgBtn">پاک کردن پس‌زمینه</button>
-          <p class="muted" style="margin-top:8px;">📁 می‌تونید تصویری از کامپیوترتان انت��اب کنید.</p>
+          <p class="muted" style="margin-top:8px;">📁 می‌تونید تصویری از کامپیوترتان انتخاب کنید.</p>
         </section>
 
         <section class="tab-content" id="tab-presets">
@@ -194,8 +258,6 @@
         <div class="paper-stage" id="paperStage">
           <div class="paper" id="paper">
             <div class="paper-header">
-              <div class="header-orb orb-1"></div>
-              <div class="header-orb orb-2"></div>
               <div class="header-content">
                 <div class="kicker">STUDY PLANNER</div>
                 <h2 id="outTitle"></h2>
