@@ -2,6 +2,7 @@ const STORAGE_KEY = "modern-study-planner-v1";
 const PRESETS_KEY = "modern-study-planner-presets-v1";
 const THEME_KEY = "modern-study-planner-theme";
 const BG_IMAGE_KEY = "modern-study-planner-bg-image";
+const OPACITY_KEY = "modern-study-planner-opacity";
 
 const defaultData = {
   title: "",
@@ -89,6 +90,7 @@ const themes = {
 
 let data = loadData();
 let currentTheme = localStorage.getItem(THEME_KEY) || "default";
+let currentOpacity = parseInt(localStorage.getItem(OPACITY_KEY)) || 15;
 let zoom = 0.75;
 
 function clone(x){ return JSON.parse(JSON.stringify(x)); }
@@ -432,6 +434,21 @@ function renderThemeButtons(){
   `).join("");
 }
 
+// Opacity Control Functions
+function setOpacity(value){
+  currentOpacity=parseInt(value);
+  localStorage.setItem(OPACITY_KEY,currentOpacity);
+  applyOpacity();
+  renderPreview();
+  const percentEl=document.getElementById("opacityPercent");
+  if(percentEl) percentEl.textContent=currentOpacity+"%";
+}
+
+function applyOpacity(){
+  const root=document.documentElement;
+  root.style.setProperty('--glass-opacity', (currentOpacity/100));
+}
+
 function handleBackgroundUpload(e){
   const file=e.target.files[0];
   if(!file) return;
@@ -670,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function(){
   
   const resetBtn=document.getElementById("resetBtn");
   if(resetBtn) resetBtn.onclick=()=>{
-    if(confirm("همه اطلاعات به قالب اولیه برگردد؟")){data=clone(defaultData);saveData(false);bindGeneral();rerenderEditors();toast("قالب اولیه بازگردانی شد")}
+    if(confirm("همه اطلاعات به قالب اولیه برگردد؟")){data=clone(defaultData);saveData(false);bindGeneral();rerenderEditors();toast("قالب اولیه بازگردانده شد")}
   };
   
   const printBtn=document.getElementById("printBtn");
@@ -722,6 +739,12 @@ document.addEventListener("DOMContentLoaded", function(){
     e.target.value="";
   });
 
+  const opacitySlider=document.getElementById("opacitySlider");
+  if(opacitySlider){
+    opacitySlider.value=currentOpacity;
+    opacitySlider.addEventListener("input",e=>setOpacity(e.target.value));
+  }
+
   const bgUploadBtn=document.getElementById("bgImageUpload");
   if(bgUploadBtn) bgUploadBtn.addEventListener("change",handleBackgroundUpload);
 
@@ -735,6 +758,7 @@ document.addEventListener("DOMContentLoaded", function(){
   renderQuoteSelector();
   applyZoom();
   applyThemeStyles();
+  applyOpacity();
   applyBackgroundImage();
 });
 
