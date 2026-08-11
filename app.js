@@ -1,6 +1,7 @@
 const STORAGE_KEY = "modern-study-planner-v1";
 const PRESETS_KEY = "modern-study-planner-presets-v1";
 const THEME_KEY = "modern-study-planner-theme";
+const CUSTOM_THEMES_KEY = "modern-study-planner-custom-themes";
 const BG_IMAGE_KEY = "modern-study-planner-bg-image";
 const OPACITY_KEY = "modern-study-planner-opacity";
 
@@ -49,42 +50,54 @@ const themes = {
     headerGrad: "linear-gradient(135deg,#101d30,#223957)",
     blockBg: "#1b2c44",
     accent: "#c99b4a",
-    accentLight: "#e5c37d"
+    accentLight: "#e5c37d",
+    headerText: "#ffffff",
+    headerTextSecondary: "#b9c6d7"
   },
   blue: {
     name: "آبی",
     headerGrad: "linear-gradient(135deg,#0f3460,#16213e)",
     blockBg: "#0f3460",
     accent: "#00b4d8",
-    accentLight: "#48cae4"
+    accentLight: "#48cae4",
+    headerText: "#ffffff",
+    headerTextSecondary: "#b0d4e3"
   },
   green: {
     name: "سبز",
     headerGrad: "linear-gradient(135deg,#1a4d2e,#2d6a4f)",
     blockBg: "#1a4d2e",
     accent: "#52b788",
-    accentLight: "#74c69d"
+    accentLight: "#74c69d",
+    headerText: "#ffffff",
+    headerTextSecondary: "#b8ddc8"
   },
   orange: {
     name: "نارنجی",
     headerGrad: "linear-gradient(135deg,#cc5500,#ff7f00)",
     blockBg: "#cc5500",
     accent: "#ff9e1b",
-    accentLight: "#ffc857"
+    accentLight: "#ffc857",
+    headerText: "#ffffff",
+    headerTextSecondary: "#ffe4cc"
   },
   pink: {
     name: "صورتی",
     headerGrad: "linear-gradient(135deg,#c2185b,#e91e63)",
     blockBg: "#c2185b",
     accent: "#f06292",
-    accentLight: "#f48fb1"
+    accentLight: "#f48fb1",
+    headerText: "#ffffff",
+    headerTextSecondary: "#f8d0dd"
   },
   purple: {
     name: "بنفش",
     headerGrad: "linear-gradient(135deg,#4a148c,#7b1fa2)",
     blockBg: "#4a148c",
     accent: "#ba68c8",
-    accentLight: "#ce93d8"
+    accentLight: "#ce93d8",
+    headerText: "#ffffff",
+    headerTextSecondary: "#e1bee7"
   }
 };
 
@@ -107,6 +120,15 @@ function loadPresets(){
 
 function savePresets(presets){
   localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+}
+
+function loadCustomThemes(){
+  try { return JSON.parse(localStorage.getItem(CUSTOM_THEMES_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+
+function saveCustomThemes(customThemes){
+  localStorage.setItem(CUSTOM_THEMES_KEY, JSON.stringify(customThemes));
 }
 
 function presetSnapshot(){
@@ -410,28 +432,108 @@ function setTheme(themeName){
   localStorage.setItem(THEME_KEY,themeName);
   applyThemeStyles();
   renderThemeButtons();
+  updateCustomizerUI();
   renderPreview();
-  toast(`تم ${themes[themeName].name} اعمال شد`);
+  toast(`تم ${themes[themeName]?.name || themeName} اعمال شد`);
+}
+
+function getTheme(themeName){
+  const customThemes = loadCustomThemes();
+  if(customThemes[themeName]){
+    return customThemes[themeName];
+  }
+  return themes[themeName];
 }
 
 function applyThemeStyles(){
-  const theme=themes[currentTheme];
+  const theme = getTheme(currentTheme);
+  if(!theme) return;
   const root=document.documentElement;
   root.style.setProperty('--theme-header-grad',theme.headerGrad);
   root.style.setProperty('--theme-block-bg',theme.blockBg);
   root.style.setProperty('--theme-accent',theme.accent);
   root.style.setProperty('--theme-accent-light',theme.accentLight);
+  root.style.setProperty('--theme-header-text',theme.headerText);
+  root.style.setProperty('--theme-header-text-secondary',theme.headerTextSecondary);
 }
 
 function renderThemeButtons(){
   const container=document.getElementById("themeButtons");
   if(!container) return;
-  container.innerHTML=Object.entries(themes).map(([key,theme])=>`
+  const customThemes = loadCustomThemes();
+  const allThemes = {...themes, ...customThemes};
+  container.innerHTML=Object.entries(allThemes).map(([key,theme])=>`
     <button class="theme-btn ${currentTheme===key?'active':''}" onclick="setTheme('${key}')" title="${theme.name}">
       <span style="background:${theme.accent}"></span>
       ${theme.name}
     </button>
   `).join("");
+}
+
+function updateCustomizerUI(){
+  const theme = getTheme(currentTheme);
+  if(!theme) return;
+  
+  const updateInput = (id, value, textId) => {
+    const input = document.getElementById(id);
+    const textEl = document.getElementById(textId);
+    if(input) input.value = value;
+    if(textEl) textEl.textContent = value;
+  };
+  
+  updateInput('headerGradColor', theme.headerGrad.includes('#') ? theme.headerGrad.match(/#[0-9a-f]{6}/i)?.[0] || '#101d30' : '#101d30', 'headerGradColorText');
+  updateInput('accentColor', theme.accent, 'accentColorText');
+  updateInput('blockBgColor', theme.blockBg, 'blockBgColorText');
+  updateInput('accentLightColor', theme.accentLight, 'accentLightColorText');
+  updateInput('headerTextColor', theme.headerText, 'headerTextColorText');
+  updateInput('headerTextSecondaryColor', theme.headerTextSecondary, 'headerTextSecondaryColorText');
+}
+
+function saveCustomTheme(){
+  const theme = getTheme(currentTheme);
+  if(!theme) return;
+  
+  const headerGradColor = document.getElementById('headerGradColor')?.value || '#101d30';
+  const accentColor = document.getElementById('accentColor')?.value || '#c99b4a';
+  const blockBgColor = document.getElementById('blockBgColor')?.value || '#1b2c44';
+  const accentLightColor = document.getElementById('accentLightColor')?.value || '#e5c37d';
+  const headerTextColor = document.getElementById('headerTextColor')?.value || '#ffffff';
+  const headerTextSecondaryColor = document.getElementById('headerTextSecondaryColor')?.value || '#b9c6d7';
+  
+  const customThemes = loadCustomThemes();
+  customThemes[currentTheme] = {
+    name: theme.name,
+    headerGrad: `linear-gradient(135deg,${headerGradColor},${adjustColorBrightness(headerGradColor, -30)})`,
+    blockBg: blockBgColor,
+    accent: accentColor,
+    accentLight: accentLightColor,
+    headerText: headerTextColor,
+    headerTextSecondary: headerTextSecondaryColor
+  };
+  
+  saveCustomThemes(customThemes);
+  applyThemeStyles();
+  renderPreview();
+  toast("تم ذخیره شد");
+}
+
+function resetCustomTheme(){
+  const customThemes = loadCustomThemes();
+  delete customThemes[currentTheme];
+  saveCustomThemes(customThemes);
+  applyThemeStyles();
+  updateCustomizerUI();
+  renderPreview();
+  toast("تم بازنشانی شد");
+}
+
+function adjustColorBrightness(color, percent) {
+  const num = parseInt(color.replace("#",""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+  const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+  const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+  return "#" + (0x1000000 + (R<16?0:1)*R*0x10000 + (G<16?0:1)*G*0x100 + (B<16?0:1)*B).toString(16).slice(1);
 }
 
 // Opacity Control Functions
@@ -515,7 +617,7 @@ async function exportToPDF(){
   const paper=document.getElementById("paper");
   if(!paper) return;
   
-  const theme=themes[currentTheme];
+  const theme=getTheme(currentTheme);
   const bgImage=localStorage.getItem(BG_IMAGE_KEY);
   
   // Clone the paper element
@@ -591,7 +693,7 @@ async function exportToImage(){
   const paper=document.getElementById("paper");
   if(!paper) return;
   
-  const theme=themes[currentTheme];
+  const theme=getTheme(currentTheme);
   const bgImage=localStorage.getItem(BG_IMAGE_KEY);
   
   // Clone the paper element
@@ -745,6 +847,25 @@ document.addEventListener("DOMContentLoaded", function(){
     opacitySlider.addEventListener("input",e=>setOpacity(e.target.value));
   }
 
+  // Theme Customizer Event Listeners
+  const colorInputs = ['headerGradColor', 'accentColor', 'blockBgColor', 'accentLightColor', 'headerTextColor', 'headerTextSecondaryColor'];
+  colorInputs.forEach(id => {
+    const input = document.getElementById(id);
+    if(input){
+      input.addEventListener('input', (e) => {
+        const textId = id + 'Text';
+        const textEl = document.getElementById(textId);
+        if(textEl) textEl.textContent = e.target.value;
+      });
+    }
+  });
+
+  const saveThemeBtn=document.getElementById("saveThemeBtn");
+  if(saveThemeBtn) saveThemeBtn.onclick=saveCustomTheme;
+
+  const resetThemeBtn=document.getElementById("resetThemeBtn");
+  if(resetThemeBtn) resetThemeBtn.onclick=resetCustomTheme;
+
   const bgUploadBtn=document.getElementById("bgImageUpload");
   if(bgUploadBtn) bgUploadBtn.addEventListener("change",handleBackgroundUpload);
 
@@ -756,6 +877,7 @@ document.addEventListener("DOMContentLoaded", function(){
   renderPresets();
   renderThemeButtons();
   renderQuoteSelector();
+  updateCustomizerUI();
   applyZoom();
   applyThemeStyles();
   applyOpacity();
